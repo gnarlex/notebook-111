@@ -1,0 +1,64 @@
+version: 1
+kind: application
+meta:
+  name: 'jupyter-notebook:1'
+  brief: Jupyter notebook application
+  source:
+    dir: .
+requires:
+  - kubernetes
+components:
+  - name: github-repository
+    source:
+      dir: components/github-repository
+  - name: ecr
+    source:
+      dir: components/ecr
+parameters:
+  - name: application.description
+    value: notebook-1
+  - name: application.image
+    value: jupyter/minimal-notebook
+  - name: application.name
+    value: notebook-1111
+  - name: application.state.file
+    fromEnv: APP_STATE_FILE
+  - name: cloud.region
+  - name: component.ecr.name
+    value: '${dns.domain}/${application.name}'
+  - name: component.git.remote
+  - name: component.github.repository.description
+    value: |
+      Java microservice with Spring Boot
+  - name: component.github.repository.name
+    value: notebook-111
+  - name: component.github.repository.organization
+    value: asibot
+  - name: component.github.token
+    fromEnv: COMPONENT_GITHUB_TOKEN
+  - name: component.github.webhook.events.json
+    value: '["push"]'
+  - name: component.github.webhook.name
+    value: github
+  - name: component.ingress.protocol
+  - name: component.jupyterhub.url
+  - name: dns.domain
+    env: DOMAIN_NAME
+  - name: terraform.bucket.name
+  - name: terraform.bucket.region
+outputs:
+  - name: application.git.remote
+    value: '${component.git.remote}'
+  - name: application.url
+    value: '${component.ingress.protocol}://${component.jupyterhub.url}'
+templates:
+  files:
+    - templates/*.template
+    - ../*.template
+lifecycle:
+  order:
+    - ecr
+    - github-repository
+  mandatory:
+    - ecr
+    - github-repository
